@@ -1,10 +1,10 @@
 import {Controller} from "@tsed/di";
 import {Get} from "@tsed/schema";
 
-@Controller("/hello-world")
+@Controller("/sync")
 export class HelloWorldController {
   @Get("/")
   get() {
-    return "hello";
+    return "Totally just synced the database for real for real, totally not just a string return..";
   }
 }
