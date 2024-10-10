@@ -1,8 +1,7 @@
-#packAPI
+# packAPI
 > our api for packUP which interacts with our postgresql database and our app.
 
-## Getting started
-## Barrelsby
+### Barrelsby
 
 This project uses [barrelsby](https://www.npmjs.com/package/barrelsby) to generate index files to import the controllers.
 
