@@ -1,0 +1,27 @@
+{
+  "name": "packapi",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-transform-types ./src/index.ts",
+    "dev": "node --experimental-transform-types --watch-path=./src ./src/index.ts",
+    "format": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.0.1",
+    "pg": "^8.13.1",
+    "slonik": "^46.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.8.1",
+    "@types/pg": "^8.11.10",
+    "prettier": "^3.3.3"
+  }
+}
