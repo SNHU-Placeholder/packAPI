@@ -1,8 +1,8 @@
 import express from "express";
-import { helloWorld } from "./routes/hello-world.ts";
+import { initRouter } from "./router.ts";
 
 const app = express();
 
-app.get("/sync", helloWorld);
+initRouter(app);
 
 app.listen(8083);

@@ -1,5 +1,7 @@
-import type { RequestHandler } from "express";
+import type { Route } from "../router.ts";
 
-export const helloWorld: RequestHandler = (req, res) => {
-    res.send("Hello World!");
+export const route: Route = app => {
+    app.get("/sync", (req, res) => {
+        res.send("Hello, World!");
+    });
 };
