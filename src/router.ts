@@ -4,15 +4,10 @@ import { join } from "node:path";
 
 export type Route = (app: Express) => void;
 
-export async function initRouter(app: Express) {
+export async function initRouter() {
     const files = await readdir(join(import.meta.dirname, "routes"), {
         recursive: true,
     });
 
-    await Promise.all(
-        files.map(async file => {
-            const route = await import(`./routes/${file}`);
-            route.route(app);
-        }),
-    );
+    await Promise.all(files.map(async file => import(`./routes/${file}`)));
 }

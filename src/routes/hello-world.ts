@@ -1,7 +1,5 @@
-import type { Route } from "../router.ts";
+import { app } from "../server.ts";
 
-export const route: Route = app => {
-    app.get("/sync", (req, res) => {
-        res.send("Hello, World!");
-    });
-};
+app.get("/sync", (req, res) => {
+    res.send("Hello, World 2!");
+});
