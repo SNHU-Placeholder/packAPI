@@ -1,5 +1,5 @@
 import { app } from "../server.ts";
 
-app.get("/sync", (req, res) => {
+app.get("/ping", (req, res) => {
     res.send("Hello, World 2!");
 });
