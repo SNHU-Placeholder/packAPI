@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users(
 
 CREATE TABLE IF NOT EXISTS trips(
     trip_id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
-    user_id uuid REFERENCES USERS(user_id),
+    user_id uuid REFERENCES users(user_id),
     trip_name TEXT,
     -- optional trip attributes --
     region CHAR(2),
@@ -16,5 +16,13 @@ CREATE TABLE IF NOT EXISTS trips(
     purpose TEXT,
     allinclusive BOOLEAN DEFAULT false,
     airport TEXT,
-    flight_time TIMESTAMP,
+    flight_time TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS items(
+    item_id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+    trip_id uuid REFERENCES trips(trip_id),
+    user_id uuid REFERENCES users(user_id),
+    item_name TEXT NOT NULL,
+    quantity SMALLINT NOT NULL
 );
