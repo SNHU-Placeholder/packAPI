@@ -1,16 +1,16 @@
 import { createPool, createSqlTag } from "slonik";
-import { z } from "zod";
+import { User } from "./model.ts";
 
 export const pool = await createPool("postgres://postgres:4I8WVsCjAars679bcEcb4buns6C0jFbM@localhost:5432/packup");
 
 export const sql = createSqlTag({
     typeAliases: {
-        user: z.object({
-            user_id: z.string().uuid(),
-            fname: z.string(),
-            lname: z.string(),
-            email: z.string().email(),
-            created: z.date(),
-        }),
+        user: User,
     },
 });
+
+export function getUser(userId: string): Promise<User> {
+    return pool.connect(connection =>
+        connection.one(sql.typeAlias("user")`SELECT * FROM users WHERE user_id = ${userId} LIMIT 1`),
+    );
+}
