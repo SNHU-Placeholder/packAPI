@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users(
     fname TEXT NOT NULL,
     lname TEXT NOT NULL,
     email TEXT NOT NULL,
-    created TIMESTAMP NOT NULL DEFAULT now(),
+    created TIMESTAMP NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS trips(

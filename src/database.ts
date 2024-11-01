@@ -1,7 +1,7 @@
 import { createPool, createSqlTag } from "slonik";
 import { User } from "./model.ts";
 
-export const pool = await createPool("postgres://postgres:4I8WVsCjAars679bcEcb4buns6C0jFbM@localhost:5432/packup");
+export const pool = await createPool("postgres://packer:sheExonmyPotilliGo@host.docker.internal:9564/pack");
 
 export const sql = createSqlTag({
     typeAliases: {
