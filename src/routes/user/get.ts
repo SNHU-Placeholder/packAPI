@@ -1,8 +1,5 @@
-import { getUser } from "../../database.ts";
-import { userRouter } from "../../router.ts";
+import { getUserLocals, userRouter } from "../../router.ts";
 
-userRouter.get("/:id", async (req, res) => {
-    const user = await getUser(req.params.id);
-
-    res.json(user);
+userRouter.get("/profile", async (req, res) => {
+    res.json(getUserLocals(res).user);
 });
