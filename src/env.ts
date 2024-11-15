@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const Env = z.object({
     NODE_ENV: z.string().default("development"),
-    OAUTH_CREDENTIALS_FILE: z.string(),
+    CREDENTIALS_FILE: z.string(),
     PORT: z.coerce.number().default(8083),
 });
 export type Env = z.infer<typeof Env>;
@@ -18,12 +18,12 @@ export const OAuthCredentials = z.object({
 });
 export type OAuthCredentials = z.infer<typeof OAuthCredentials>;
 
-export const EnvFile = z.object({
+export const CredentialsFile = z.object({
     db: z.string(),
     oauth: z.object({
         google: OAuthCredentials,
     }),
 });
-export type OAuthCredentialsFile = z.infer<typeof EnvFile>;
+export type CredentialsFile = z.infer<typeof CredentialsFile>;
 
-export const envFile = EnvFile.parse(JSON.parse(await readFile(env.OAUTH_CREDENTIALS_FILE, "utf-8")));
+export const envFile = CredentialsFile.parse(JSON.parse(await readFile(env.CREDENTIALS_FILE, "utf-8")));

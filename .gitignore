@@ -53,6 +53,6 @@ test/**/*.js.map
 /dist
 
 #env
-.env.local
-.env.development
+.env*
 env*.json
+credentials*.json
