@@ -18,8 +18,8 @@ export const Trip = z.object({
     purpose: z.string(),
     allinclusive: z.boolean(),
     airport: z.string(),
-    flight_time: z.date()
-})
+    flight_time: z.date(),
+});
 export type Trip = z.infer<typeof Trip>;
 
 export const Item = z.object({
@@ -27,6 +27,6 @@ export const Item = z.object({
     trip_id: z.string().uuid(),
     user_id: z.string().uuid(),
     item_name: z.string(),
-    quantity: z.string()
-})
+    quantity: z.string(),
+});
 export type Item = z.infer<typeof Item>;
