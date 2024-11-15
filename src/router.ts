@@ -1,7 +1,8 @@
-import { Router, type Express } from "express";
+import { Router, type Express, type Response } from "express";
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { auth } from "./middleware/auth.ts";
+import { User } from "./model.ts";
 
 export type Route = (app: Express) => void;
 
@@ -18,10 +19,15 @@ userRouter.use(auth);
 tripRouter.use(auth);
 itemRouter.use(auth);
 
+/** Must only be used in /user routes */
+export function getUserLocals(res: Response) {
+    return { user: res.locals.user as User };
+}
+
 export async function initRouter(app: Express) {
     app.use("/user", userRouter);
-    app.use("/trip", tripRouter);
-    app.use("/item", itemRouter);
+    app.use("/trips", tripRouter);
+    tripRouter.use("/items", itemRouter);
 
     const files = await readdir(join(import.meta.dirname, "routes"), {
         recursive: true,

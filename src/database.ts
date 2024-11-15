@@ -1,23 +1,15 @@
 import { createPool, createSqlTag } from "slonik";
-import { User, Trip, Item } from "./model.ts";
-import dotenv from "dotenv";
+import { envFile } from "./env.ts";
+import { Item, Session, Trip, User } from "./model.ts";
 
-dotenv.config();
-const POSTGRES_USER = process.env.POSTGRES_USER;
-const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD;
-const POSTGRES_DATABASE = process.env.POSTGRES_DATABASE;
-const DATABASE_ADDRESS = process.env.DATABASE_ADDRESS;
-const DATABASE_PORT = process.env.DATABASE_PORT;
-
-export const pool = await createPool(
-    `postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DATABASE_ADDRESS}:${DATABASE_PORT}/${POSTGRES_DATABASE}`,
-);
+export const pool = await createPool(envFile.db);
 
 export const sql = createSqlTag({
     typeAliases: {
         user: User,
         trip: Trip,
         item: Item,
+        session: Session,
     },
 });
 
@@ -27,20 +19,57 @@ export function getUser(userId: string): Promise<User> {
     );
 }
 
-export function getUserTrips(userId: string): Promise<User> {
+export function getUserTrips(userId: string): Promise<readonly Trip[]> {
     return pool.connect(connection =>
-        connection.one(sql.typeAlias("user")`SELECT * FROM trips WHERE user_id = ${userId};`),
+        connection.many(sql.typeAlias("trip")`SELECT * FROM trips WHERE user_id = ${userId};`),
     );
 }
 
-export function getTrip(tripID: string): Promise<User> {
+export function getTrip(tripID: string): Promise<Trip> {
     return pool.connect(connection =>
-        connection.one(sql.typeAlias("user")`SELECT * FROM trips WHERE trip_id = ${tripID} LIMIT 1;`),
+        connection.one(sql.typeAlias("trip")`SELECT * FROM trips WHERE trip_id = ${tripID} LIMIT 1;`),
     );
 }
 
-export function getItemsByTrip(tripID: string): Promise<User> {
+export function getItemsByTrip(tripID: string): Promise<readonly Item[]> {
     return pool.connect(connection =>
-        connection.one(sql.typeAlias("user")`SELECT * FROM items WHERE trip_id = ${tripID};`),
+        connection.many(sql.typeAlias("item")`SELECT * FROM items WHERE trip_id = ${tripID};`),
+    );
+}
+
+export function createUser(fname: string, lname: string, email: string): Promise<User> {
+    return pool.connect(connection =>
+        connection.one(sql.typeAlias("user")`
+            INSERT INTO users (fname, lname, email)
+            VALUES (${fname}, ${lname}, ${email})
+            ON CONFLICT (email)
+            DO UPDATE
+                SET fname = EXCLUDED.fname, lname = EXCLUDED.lname
+            RETURNING *
+        `),
+    );
+}
+
+export function createSession(userId: string): Promise<Session> {
+    return pool.connect(connection =>
+        connection.one(sql.typeAlias("session")`
+            INSERT INTO sessions
+            VALUES (${userId})
+            ON CONFLICT (token)
+                DO UPDATE SET token = ENCODE(gen_random_bytes(128), 'base64')
+            RETURNING *
+        `),
+    );
+}
+
+export function getUserByToken(token: string): Promise<User | null> {
+    return pool.connect(connection =>
+        connection.maybeOne(sql.typeAlias("user")`
+            SELECT users.*
+            FROM sessions
+                    JOIN users ON users.user_id = sessions.user_id
+            WHERE token = ${token}
+            LIMIT 1
+        `),
     );
 }

@@ -5,18 +5,18 @@ export const User = z.object({
     fname: z.string(),
     lname: z.string(),
     email: z.string().email(),
-    created: z.date(),
+    created: z.coerce.date(),
 });
 export type User = z.infer<typeof User>;
 
 export const Trip = z.object({
     trip_id: z.string().uuid(),
     user_id: z.string().uuid(),
-    trip_name: z.string(),
+    name: z.string(),
     region: z.string().length(2).optional(),
-    triplength: z.number(),
+    length: z.number(),
     purpose: z.string(),
-    allinclusive: z.boolean(),
+    all_inclusive: z.boolean(),
     airport: z.string(),
     flight_time: z.date(),
 });
@@ -30,3 +30,11 @@ export const Item = z.object({
     quantity: z.string(),
 });
 export type Item = z.infer<typeof Item>;
+
+export const Session = z.object({
+    user_id: z.string().uuid(),
+    expires: z.coerce.date(),
+    created: z.coerce.date(),
+    token: z.string(),
+});
+export type Session = z.infer<typeof Session>;
