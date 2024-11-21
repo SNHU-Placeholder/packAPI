@@ -1,8 +1,8 @@
 import { createPool, createSqlTag } from "slonik";
-import { envFile } from "./env.ts";
+import { credentials } from "./env.ts";
 import { Item, Session, Trip, User } from "./model.ts";
 
-export const pool = await createPool(envFile.db);
+export const pool = await createPool(credentials.db);
 
 export const sql = createSqlTag({
     typeAliases: {

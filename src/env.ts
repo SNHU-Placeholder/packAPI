@@ -26,4 +26,4 @@ export const CredentialsFile = z.object({
 });
 export type CredentialsFile = z.infer<typeof CredentialsFile>;
 
-export const envFile = CredentialsFile.parse(JSON.parse(await readFile(env.CREDENTIALS_FILE, "utf-8")));
+export const credentials = CredentialsFile.parse(JSON.parse(await readFile(env.CREDENTIALS_FILE, "utf-8")));

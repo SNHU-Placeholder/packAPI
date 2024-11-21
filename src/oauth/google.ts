@@ -1,5 +1,5 @@
 import { OAuth2Client } from "google-auth-library";
-import { envFile } from "../env.ts";
+import { credentials } from "../env.ts";
 
 export const scopes = [
     "https://www.googleapis.com/auth/userinfo.email",
@@ -7,14 +7,14 @@ export const scopes = [
     "openid",
 ];
 
-const credentials = envFile.oauth.google;
+const google = credentials.oauth.google;
 
 export function createOAuthClient() {
     return new OAuth2Client({
-        clientId: credentials.client_id,
-        clientSecret: credentials.client_secret,
-        projectId: credentials.project_id,
-        redirectUri: credentials.redirect_uri,
+        clientId: google.client_id,
+        clientSecret: google.client_secret,
+        projectId: google.project_id,
+        redirectUri: google.redirect_uri,
     });
 }
 
