@@ -1,6 +1,6 @@
 import { createPool, createSqlTag } from "slonik";
 import { credentials } from "./env.ts";
-import { Item, Session, Trip, User } from "./model.ts";
+import { Item, NewItem, NewTrip, Session, Trip, User } from "./model.ts";
 
 export const pool = await createPool(credentials.db);
 
@@ -13,9 +13,9 @@ export const sql = createSqlTag({
     },
 });
 
-export function getUser(userId: string): Promise<User> {
+export function getUser(userId: string): Promise<User | null> {
     return pool.connect(connection =>
-        connection.one(sql.typeAlias("user")`SELECT * FROM users WHERE user_id = ${userId} LIMIT 1;`),
+        connection.maybeOne(sql.typeAlias("user")`SELECT * FROM users WHERE user_id = ${userId} LIMIT 1;`),
     );
 }
 
@@ -25,9 +25,9 @@ export function getUserTrips(userId: string): Promise<readonly Trip[]> {
     );
 }
 
-export function getTrip(tripID: string): Promise<Trip> {
+export function getTrip(tripID: string): Promise<Trip | null> {
     return pool.connect(connection =>
-        connection.one(sql.typeAlias("trip")`SELECT * FROM trips WHERE trip_id = ${tripID} LIMIT 1;`),
+        connection.maybeOne(sql.typeAlias("trip")`SELECT * FROM trips WHERE trip_id = ${tripID} LIMIT 1;`),
     );
 }
 
@@ -57,6 +57,31 @@ export function createSession(userId: string): Promise<Session> {
             VALUES (${userId})
             ON CONFLICT (token)
                 DO UPDATE SET token = ENCODE(gen_random_bytes(128), 'base64')
+            RETURNING *
+        `),
+    );
+}
+
+export function createTrip(trip: NewTrip, userId: string): Promise<Trip> {
+    return pool.connect(connection =>
+        connection.one(sql.typeAlias("trip")`
+            INSERT INTO trips (user_id, name, region, length, purpose, all_inclusive, airport, flight_time)
+            VALUES (${userId}, ${trip.name}, ${trip.region}, ${trip.length}, ${trip.purpose},
+                    ${trip.all_inclusive}, ${trip.airport}, ${trip.flight_time.toISOString()})
+            RETURNING *
+        `),
+    );
+}
+
+export async function createItem(item: NewItem, userId: string): Promise<Trip> {
+    const trip = await getTrip(item.trip_id);
+
+    if (!trip || trip.user_id !== userId) throw new Error("Trip not found");
+
+    return pool.connect(connection =>
+        connection.one(sql.typeAlias("trip")`
+            INSERT INTO trips (user_id, trip_id, item_name, quantity)
+            VALUES (${userId}, ${item.trip_id}, ${item.item_name}, ${item.quantity})
             RETURNING *
         `),
     );

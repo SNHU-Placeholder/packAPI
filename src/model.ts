@@ -13,14 +13,17 @@ export const Trip = z.object({
     trip_id: z.string().uuid(),
     user_id: z.string().uuid(),
     name: z.string(),
-    region: z.string().length(2).optional(),
+    region: z.string().length(2),
     length: z.number(),
     purpose: z.string(),
     all_inclusive: z.boolean(),
     airport: z.string(),
-    flight_time: z.date(),
+    flight_time: z.coerce.date(),
 });
 export type Trip = z.infer<typeof Trip>;
+
+export const NewTrip = Trip.omit({ trip_id: true, user_id: true });
+export type NewTrip = z.infer<typeof NewTrip>;
 
 export const Item = z.object({
     item_id: z.string().uuid(),
@@ -30,6 +33,9 @@ export const Item = z.object({
     quantity: z.string(),
 });
 export type Item = z.infer<typeof Item>;
+
+export const NewItem = Item.omit({ item_id: true, user_id: true });
+export type NewItem = z.infer<typeof NewItem>;
 
 export const Session = z.object({
     user_id: z.string().uuid(),
