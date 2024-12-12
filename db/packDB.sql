@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS items
     trip_id   uuid REFERENCES trips (trip_id),
     user_id   uuid REFERENCES users (user_id),
     item_name TEXT             NOT NULL,
-    quantity  SMALLINT         NOT NULL
+    quantity  SMALLINT         NOT NULL,
+    checked   BOOLEAN          NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS sessions

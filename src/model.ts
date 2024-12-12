@@ -26,11 +26,12 @@ export const NewTrip = Trip.omit({ trip_id: true, user_id: true });
 export type NewTrip = z.infer<typeof NewTrip>;
 
 export const Item = z.object({
+    checked: z.boolean().default(false),
     item_id: z.string().uuid(),
     trip_id: z.string().uuid(),
     user_id: z.string().uuid(),
     item_name: z.string(),
-    quantity: z.string(),
+    quantity: z.number(),
 });
 export type Item = z.infer<typeof Item>;
 
