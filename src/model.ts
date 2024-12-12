@@ -17,8 +17,7 @@ export const Trip = z.object({
     length: z.number(),
     purpose: z.string(),
     all_inclusive: z.boolean(),
-    airport: z.string(),
-    flight_time: z.coerce.date(),
+    start_date: z.coerce.date(),
 });
 export type Trip = z.infer<typeof Trip>;
 
@@ -37,6 +36,9 @@ export type Item = z.infer<typeof Item>;
 
 export const NewItem = Item.omit({ item_id: true, user_id: true });
 export type NewItem = z.infer<typeof NewItem>;
+
+export const ItemUpdate = NewItem.omit({ trip_id: true }).partial();
+export type ItemUpdate = z.infer<typeof ItemUpdate>;
 
 export const Session = z.object({
     user_id: z.string().uuid(),

@@ -1,6 +1,6 @@
 import { createPool, createSqlTag } from "slonik";
 import { credentials } from "./env.ts";
-import { Item, NewItem, NewTrip, Session, Trip, User } from "./model.ts";
+import { Item, ItemUpdate, NewItem, NewTrip, Session, Trip, User } from "./model.ts";
 
 export const pool = await createPool(credentials.db);
 
@@ -25,15 +25,21 @@ export function getUserTrips(userId: string): Promise<readonly Trip[]> {
     );
 }
 
-export function getTrip(tripID: string): Promise<Trip | null> {
+export function getTrip(tripId: string, userId: string): Promise<Trip | null> {
     return pool.connect(connection =>
-        connection.maybeOne(sql.typeAlias("trip")`SELECT * FROM trips WHERE trip_id = ${tripID} LIMIT 1;`),
+        connection.maybeOne(
+            sql.typeAlias("trip")`SELECT * FROM trips WHERE trip_id = ${tripId} AND user_id = ${userId} LIMIT 1;`,
+        ),
     );
 }
 
-export function getItemsByTrip(tripID: string): Promise<readonly Item[]> {
+export async function getItemsByTrip(tripId: string, userId: string): Promise<readonly Item[]> {
+    const trip = await getTrip(tripId, userId);
+
+    if (!trip) throw new Error("Trip not found");
+
     return pool.connect(connection =>
-        connection.many(sql.typeAlias("item")`SELECT * FROM items WHERE trip_id = ${tripID};`),
+        connection.many(sql.typeAlias("item")`SELECT * FROM items WHERE trip_id = ${tripId};`),
     );
 }
 
@@ -65,23 +71,46 @@ export function createSession(userId: string): Promise<Session> {
 export function createTrip(trip: NewTrip, userId: string): Promise<Trip> {
     return pool.connect(connection =>
         connection.one(sql.typeAlias("trip")`
-            INSERT INTO trips (user_id, name, region, length, purpose, all_inclusive, airport, flight_time)
+            INSERT INTO trips (user_id, name, region, length, purpose, all_inclusive)
             VALUES (${userId}, ${trip.name}, ${trip.region}, ${trip.length}, ${trip.purpose},
-                    ${trip.all_inclusive}, ${trip.airport}, ${trip.flight_time.toISOString()})
+                    ${trip.all_inclusive})
             RETURNING *
         `),
     );
 }
 
-export async function createItem(item: NewItem, userId: string): Promise<Trip> {
-    const trip = await getTrip(item.trip_id);
+export async function createItem(item: NewItem, userId: string): Promise<Item> {
+    const trip = await getTrip(item.trip_id, userId);
 
-    if (!trip || trip.user_id !== userId) throw new Error("Trip not found");
+    if (!trip) throw new Error("Trip not found");
 
     return pool.connect(connection =>
-        connection.one(sql.typeAlias("trip")`
-            INSERT INTO trips (user_id, trip_id, item_name, quantity)
-            VALUES (${userId}, ${item.trip_id}, ${item.item_name}, ${item.quantity})
+        connection.one(sql.typeAlias("item")`
+            INSERT INTO items (user_id, trip_id, item_name, quantity, checked)
+            VALUES (${userId}, ${item.trip_id}, ${item.item_name}, ${item.quantity}, ${item.checked})
+            RETURNING *
+        `),
+    );
+}
+
+export async function updateItem(itemId: string, tripId: string, userId: string, item: ItemUpdate): Promise<Item> {
+    const trip = await getTrip(tripId, userId);
+
+    if (!trip) throw new Error("Trip not found");
+
+    const updateFields = Object.entries(item).map(
+        ([key, value]) => sql.typeAlias("item")`${sql.identifier([key])} = ${value}`,
+    );
+
+    if (updateFields.length === 0) throw new Error("No fields to update");
+
+    const updateClause = sql.join(updateFields, sql.fragment`, `);
+
+    return pool.connect(connection =>
+        connection.one(sql.typeAlias("item")`
+            UPDATE items
+            SET ${updateClause}
+            WHERE item_id = ${itemId} AND trip_id = ${tripId} AND user_id = ${userId}
             RETURNING *
         `),
     );

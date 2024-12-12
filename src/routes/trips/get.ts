@@ -1,8 +1,8 @@
 import { getTrip } from "../../database.ts";
-import { tripRouter } from "../../router.ts";
+import { getUser, tripRouter } from "../../router.ts";
 
-tripRouter.get("/:id", async (req, res) => {
-    const trip = await getTrip(req.params.id);
+tripRouter.get("/:trip", async (req, res) => {
+    const trip = await getTrip(req.params.trip, getUser(res).user_id);
 
     if (!trip) {
         res.status(404).json({ message: "Trip not found" });

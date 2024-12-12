@@ -1,16 +1,14 @@
 import { createItem } from "../../../database.ts";
-import { NewItem, User } from "../../../model.ts";
-import { itemRouter } from "../../../router.ts";
+import { NewItem } from "../../../model.ts";
+import { getUser, tripRouter } from "../../../router.ts";
 
-itemRouter.post("/", async (req, res) => {
-    const data = NewItem.safeParse(req.body);
+tripRouter.post("/:trip/items", async (req, res) => {
+    const data = NewItem.safeParse({ ...req.body, trip_id: req.params.trip });
     if (!data.success) {
-        res.status(400).json(data.error.message);
+        res.status(400).json(data.error.issues);
         return;
     }
 
-    const user = res.locals.user as User;
-
-    const item = await createItem(data.data, user.user_id);
+    const item = await createItem(data.data, getUser(res).user_id);
     res.json(item);
 });

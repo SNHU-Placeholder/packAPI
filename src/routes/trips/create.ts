@@ -1,6 +1,6 @@
 import { createTrip } from "../../database.ts";
-import { NewTrip, User } from "../../model.ts";
-import { tripRouter } from "../../router.ts";
+import { NewTrip } from "../../model.ts";
+import { getUser, tripRouter } from "../../router.ts";
 
 tripRouter.post("/", async (req, res) => {
     const data = NewTrip.safeParse(req.body);
@@ -9,8 +9,6 @@ tripRouter.post("/", async (req, res) => {
         return;
     }
 
-    const user = res.locals.user as User;
-
-    const trip = await createTrip(data.data, user.user_id);
+    const trip = await createTrip(data.data, getUser(res).user_id);
     res.json(trip);
 });

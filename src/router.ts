@@ -19,9 +19,9 @@ userRouter.use(auth);
 tripRouter.use(auth);
 itemRouter.use(auth);
 
-/** Must only be used in /user routes */
-export function getUserLocals(res: Response) {
-    return { user: res.locals.user as User };
+/** Must only be used in auth-gated routes */
+export function getUser(res: Response) {
+    return res.locals.user as User;
 }
 
 export async function initRouter(app: Express) {
