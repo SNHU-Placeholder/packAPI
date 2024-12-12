@@ -19,8 +19,7 @@ CREATE TABLE IF NOT EXISTS trips
     length        INTEGER,
     purpose       TEXT,
     all_inclusive BOOLEAN                   DEFAULT FALSE,
-    airport       TEXT,
-    flight_time   TIMESTAMP
+    start_date    date            NOT NULL  DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE IF NOT EXISTS items
